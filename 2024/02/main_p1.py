@@ -1,40 +1,21 @@
 import re
 
-puzzle_input = "2024/inputs/02_input.txt"
-#puzzle_input = "2024/inputs/02_sample.txt"
+puzzle_input = "2024/inputs/03_input.txt"
+#puzzle_input = "2024/inputs/03_sample.txt"
 
 # Read puzzle input
 f = open(puzzle_input,"r")
 lines = f.readlines()
 
-reports = []
-for line in lines:
-    numbers = re.findall(r'\d+', line.replace("\n",""))
-    reports.append(numbers)
+# Convert into a single string
+s = "".join(lines)
 
-# Find safe reports
-min_sep = 1
-max_sep = 3
-safe_reports = 0
+# Find all mul(X,Y) values
+mul_values = re.findall(r'mul\((\d+),(\d+)\)', s)
 
-for report in reports:
+sum = 0
+for val in mul_values:
+    sum = sum + (int(val[0]) * int(val[1]))
 
-    safe = True
-    first_diff = int(report[1]) - int(report[0])
-    
-    # all increasing
-    if first_diff < 0:
-        report = report[::-1]
-
-    for i in range(len(report)-1):
-        diff = int(report[i+1]) - int(report[i])
-        # if report not safe, stop
-        if diff < min_sep or diff > max_sep:
-            safe = False
-            break
-
-    if safe:
-        safe_reports = safe_reports + 1
-
-print(f"How many reports are safe? Answer: {safe_reports}")
-#257
+print(f"What do you get if you add up all of the results of the multiplications? Answer: {sum}")
+#184122457
