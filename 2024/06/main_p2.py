@@ -50,54 +50,83 @@ def is_adjacent(pos, obstacle):
     return False
 
 
+def is_loop(start_pos, start_dir, room, obstacles):
+
+    curr_dir = start_dir
+    i, j = start_pos
+    positions_dict = {}
+    positions_dict[(i.tolist()[0], j.tolist()[0])] = curr_dir
+    
+    while (is_out_room([i, j], room) == False):
+    
+        # Move forward
+        if curr_dir == "up":
+            new_pos = [i-1, j]
+        elif curr_dir == "right":
+            new_pos = [i, j + 1]
+        elif curr_dir == "down":
+            new_pos = [i+1, j]
+        elif curr_dir == "left":
+            new_pos = [i, j - 1]
+        
+        new_pos_easy = (new_pos[0].tolist()[0], new_pos[1].tolist()[0])
+
+        # Check if the guard is facing an obstacle
+        if {new_pos_easy}.issubset(obstacles):
+            #print(f"Obstacle at position {new_pos}")
+            # Turn right
+            curr_dir = new_direction(curr_dir)
+
+        else:
+            if new_pos_easy in positions_dict.keys():
+                if positions_dict.get(new_pos_easy) == curr_dir:
+                    return True
+            
+            positions_dict[new_pos_easy] = curr_dir
+            i, j = new_pos
+    
+    return False
+
+
 # Find starting position marked as "^" and obstacles marked as "#"
+i,j = np.where(room == "^")
+start_pos = np.where(room == "^")
 obstacles = np.where(room == "#")
-obstacles = set(zip(obstacles[0], obstacles[1]))
-loops = 0
+positions = set()
+positions.add((i.tolist()[0], j.tolist()[0]))
+curr_dir = "up"
+loops = set()
 
-for obsti in range(len(room)):
-    for obstj in range(len(room[0])):
+while is_out_room([i, j], room) == False:
+    
+    # Move forward
+    if curr_dir == "up":
+        new_pos = [i-1, j]
+    elif curr_dir == "right":
+        new_pos = [i, j + 1]
+    elif curr_dir == "down":
+        new_pos = [i+1, j]
+    elif curr_dir == "left":
+        new_pos = [i, j - 1]
 
-        #print(f"Checking for obstacle {(obsti,obstj)}")
+    # Check if the guard is facing an obstacle
+    if (new_pos[0], new_pos[1]) in list(zip(obstacles[0], obstacles[1])):
+        # Turn right
+        curr_dir = new_direction(curr_dir)
 
-        i,j = np.where(room == "^")
-        obstacles_new = obstacles.copy()
-        obstacles_new.add((obsti,obstj))
-        count_dir = 0
-        loop = False
-        curr_dir = "up"
-        positions_dict = {}
-        positions_dict[(i.tolist()[0], j.tolist()[0])] = curr_dir
+    else:
+        # Check if current new position can be a new obstacle for loops
+        new_pos_easy = (new_pos[0].tolist()[0], new_pos[1].tolist()[0])
+        new_obstacles = list(zip(obstacles[0], obstacles[1])).copy()
+        new_obstacles.append(new_pos_easy)
 
-        while (loop == False) and (is_out_room([i, j], room) == False):
-            
-            # Move forward
-            if curr_dir == "up":
-                new_pos = [i-1, j]
-            elif curr_dir == "right":
-                new_pos = [i, j + 1]
-            elif curr_dir == "down":
-                new_pos = [i+1, j]
-            elif curr_dir == "left":
-                new_pos = [i, j - 1]
+        if is_loop(start_pos, "up", room, new_obstacles):
+            loops.add(new_pos_easy)
+            print(f"Loop at position {new_pos_easy}")
 
-            # Check if the guard is facing an obstacle
-            if {(new_pos[0].tolist()[0], new_pos[1].tolist()[0])}.issubset(obstacles_new):
-                #print(f"Obstacle at position {new_pos}")
-                # Turn right
-                curr_dir = new_direction(curr_dir)
-            
-            else:
-                new_pos_easy = (new_pos[0].tolist()[0], new_pos[1].tolist()[0])
-                if new_pos_easy in positions_dict.keys():
+        positions.add(new_pos_easy)
+        #print(f"Positions {positions}")
+        i, j = new_pos
 
-                    if (positions_dict.get(new_pos_easy) == curr_dir) and is_adjacent(new_pos, [obsti, obstj]):
-                        loop = True
-                        loops = loops + 1
-                        #print(f"Loop for obstacle {(obsti,obstj)} looping at position {new_pos_easy}")
-                
-                i, j = new_pos
-                positions_dict[new_pos_easy] = curr_dir
-
-print(f"How many different positions could you choose for this obstruction? {loops}")
-#5208
+print(f"How many different positions could you choose for this obstruction? {len(loops)}")
+#1972
