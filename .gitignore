@@ -1,4 +1,5 @@
 *.DS_Store
 *.txt
+*.png
 2023/inputs
 .vscode/settings.json
