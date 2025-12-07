@@ -3,7 +3,7 @@ from math import prod
 import re
 
 puzzle_input = "2025/inputs/06_input.txt"
-puzzle_input = "2025/inputs/06_sample.txt"
+#puzzle_input = "2025/inputs/06_sample.txt"
 
 def read_puzzle_input(file):
     # Read puzzle input
@@ -61,4 +61,4 @@ for j in range(len(ops)):
 
 print(f"What is the grand total found by adding together all of the answers to the individual problems? {sum(col_totals)}")
 # sample = 3263827
-# 
+# 8674740488592
